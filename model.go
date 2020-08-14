@@ -5,26 +5,34 @@ import (
 	"net/http"
 )
 
-type CanvaAsset struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Url  string `json:"url"`
+const (
+	TypeSuccess                    = "SUCCESS"
+	TypeError                      = "ERROR"
+	ErrorCodeInvalidRequest        = "INVALID_REQUEST"
+	ErrorCodeInternalError         = "INTERNAL_ERROR"
+	ErrorCodeConfigurationRequired = "CONFIGURATION_REQUIRED"
+	ErrorCodeForbidden             = "FORBIDDEN"
+	ErrorCodeNotFound              = "NOT_FOUND"
+	ErrorCodeTimeout               = "TIMEOUT"
+)
+
+// Response is a response to a request coming from Canva.com
+type Response struct {
+	Type      string `json:"type"`
+	Resources string `json:"resources,omitempty"`
+	ErrorCode string `json:"errorCode,omitempty"`
+	URL       string `json:"url,omitempty"`
 }
 
-type CanvaMessage struct {
-	User    string
-	Brand   string
-	Label   string
-	Message string
-	Assets  []CanvaAsset `json:"assets"`
+// NewErrorResponse creates a new error response
+// see: https://www.canva.com/developers/docs/content-extensions/error-handling/
+func NewErrorResponse(errorCode string) Response {
+	return Response{Type: TypeError, ErrorCode: errorCode}
 }
 
-type CanvaResponse struct {
-	Type string `json:"type"`
-}
-
-func NewSuccessResponse() CanvaResponse {
-	return CanvaResponse{Type: "SUCCESS"}
+// NewSuccessResponse creates an empty success response
+func NewSuccessResponse() Response {
+	return Response{Type: TypeSuccess}
 }
 
 // WriteSuccessResponse will write a correct success response
